@@ -19,7 +19,7 @@ se.EmpiarCatalog().search("ribosome")  # search the whole archive by metadata (i
 ## Install
 
 ```bash
-pip install "scigantic-empiar[viz] @ git+https://github.com/scigantic/scigantic-empiar"
+pip install "scigantic-empiar[viz]"
 ```
 
 Core (`numpy`, `requests`) is enough for the readers; `[viz]` adds `matplotlib` / `pandas` / `pillow` for `preview()` and the catalog gallery.
