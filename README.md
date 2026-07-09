@@ -12,7 +12,7 @@ se.EmpiarClient().summary(10406)       # title, pixel size, method, DOI, EMDB/PD
 se.EmpiarCatalog().search("ribosome")  # search the whole archive by metadata (instant)
 ```
 
-![A motion-corrected 70S-ribosome micrograph (EMPIAR-10406) and its power spectrum, rendered by se.preview(10406)](docs/preview_10406.png)
+![A motion-corrected 70S-ribosome micrograph (EMPIAR-10406) and its power spectrum, rendered by se.preview(10406)](https://raw.githubusercontent.com/scigantic/scigantic-empiar/main/docs/preview_10406.png)
 
 *One frame of EMPIAR-10406 (a 70S-ribosome dataset) pulled straight from EBI over parallel range reads — the carbon-foil edge, ice, and particles are visible at left; the FFT is at right. Nothing was downloaded to disk.*
 
