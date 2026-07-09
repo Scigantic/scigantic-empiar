@@ -2,15 +2,19 @@
 
 Explore [EMPIAR](https://www.ebi.ac.uk/empiar/) — EMBL-EBI's public archive of **raw cryo-EM / cryo-ET image data** (~3,000 datasets, ~8.9 PiB) — from Python, **without downloading anything**.
 
-EMPIAR is served over EBI's public HTTPS at ~1.5 MB/s per connection. `scigantic_empiar` parallelises HTTP **range** reads (8-way ≈ 5–10 MB/s) so you can pull a single frame from a 260 GB entry in seconds, decode the MRC, and render the micrograph + its power spectrum — nothing is copied to disk.
+EMPIAR is served over EBI's public HTTPS at ~1.5 MB/s per connection. `scigantic_empiar` parallelises HTTP **range** reads (8-way ≈ 5–10 MB/s) so you can pull a single frame from a many-GB entry in seconds, decode the MRC, and render the micrograph + its power spectrum — nothing is copied to disk.
 
 ```python
 import scigantic_empiar as se
 
-se.preview(10002)                      # a real S. cerevisiae 80S ribosome micrograph + FFT, in seconds
-se.EmpiarClient().summary(10002)       # title, pixel size, method, DOI, EMDB/PDB cross-refs
+se.preview(10406)                      # render the micrograph below, in seconds
+se.EmpiarClient().summary(10406)       # title, pixel size, method, DOI, EMDB/PDB cross-refs
 se.EmpiarCatalog().search("ribosome")  # search the whole archive by metadata (instant)
 ```
+
+![A motion-corrected 70S-ribosome micrograph (EMPIAR-10406) and its power spectrum, rendered by se.preview(10406)](docs/preview_10406.png)
+
+*One frame of EMPIAR-10406 (a 70S-ribosome dataset) pulled straight from EBI over parallel range reads — the carbon-foil edge, ice, and particles are visible at left; the FFT is at right. Nothing was downloaded to disk.*
 
 ## Install
 
@@ -37,7 +41,7 @@ Core (`numpy`, `requests`) is enough for the readers; `[viz]` adds `matplotlib` 
 
 EBI throttles per connection (~1.5 MB/s) and past ~8 concurrent connections. `pread` splits a read into ~8 concurrent range requests, which aggregates to ~5–10 MB/s — enough to *look* at any entry interactively. For heavy reprocessing of a whole multi-hundred-GB dataset, mirror it to fast storage first (`add_to_fast_workspace`); streaming a full entry at 1.5 MB/s isn't practical.
 
-## Design / prior art
+## Existing work
 
 The job splits in two: parse MRC, and read bytes from a remote file. Both have existing libraries; neither covers the specific case here.
 

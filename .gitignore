@@ -5,5 +5,7 @@ build/
 dist/
 .venv/
 *.png
+# keep README assets under docs/
+!docs/*.png
 *.ipynb_checkpoints
 .DS_Store
