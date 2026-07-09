@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scigantic-empiar"
+version = "0.1.0"
+description = "Explore the EMPIAR cryo-EM archive from Python — stream any of ~3,000 datasets (8.9 PiB) over parallel HTTP range reads, nothing downloaded."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Scigantic" }]
+keywords = ["cryo-em", "cryo-et", "empiar", "mrc", "structural-biology", "microscopy"]
+dependencies = [
+    "numpy",
+    "requests",
+]
+
+[project.optional-dependencies]
+# Needed for preview() (rendering) and EmpiarCatalog gallery/search.
+viz = ["matplotlib", "pandas", "pillow", "ipython"]
+
+[project.urls]
+Homepage = "https://github.com/aaronkanzer/scigantic-empiar"
+"EMPIAR" = "https://www.ebi.ac.uk/empiar/"
+
+[tool.setuptools]
+packages = ["scigantic_empiar"]
