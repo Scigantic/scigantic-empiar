@@ -22,7 +22,7 @@ viz = ["matplotlib", "pandas", "pillow", "ipython"]
 dev = ["pytest", "matplotlib", "pandas"]
 
 [project.urls]
-Homepage = "https://github.com/aaronkanzer/scigantic-empiar"
+Homepage = "https://github.com/scigantic/scigantic-empiar"
 "EMPIAR" = "https://www.ebi.ac.uk/empiar/"
 
 [tool.setuptools]

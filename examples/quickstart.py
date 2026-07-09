@@ -1,6 +1,6 @@
 """Quickstart: explore EMPIAR from anywhere with internet — nothing downloaded.
 
-    pip install "scigantic-empiar[viz] @ git+https://github.com/aaronkanzer/scigantic-empiar"
+    pip install "scigantic-empiar[viz] @ git+https://github.com/scigantic/scigantic-empiar"
     python examples/quickstart.py
 """
 import scigantic_empiar as se
