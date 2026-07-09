@@ -37,6 +37,14 @@ Core (`numpy`, `requests`) is enough for the readers; `[viz]` adds `matplotlib` 
 
 EBI throttles per connection (~1.5 MB/s) and past ~8 concurrent connections. `pread` splits a read into ~8 concurrent range requests, which aggregates to ~5–10 MB/s — enough to *look* at any entry interactively. For heavy reprocessing of a whole multi-hundred-GB dataset, mirror it to fast storage first (`add_to_fast_workspace`); streaming a full entry at 1.5 MB/s isn't practical.
 
+## Design / prior art
+
+The job splits in two: parse MRC, and read bytes from a remote file. Both have existing libraries; neither covers the specific case here.
+
+- [`mrcfile`](https://github.com/ccpem/mrcfile) (CCP-EM) is the standard MRC reader. Its lazy mode is a numpy `memmap`, which needs a local filesystem path — it does not issue HTTP range requests. `scigantic_empiar` parses the 1024-byte header directly (`parse_mrc_header`) to seek to one frame of a remote file without a local copy.
+- [`fsspec`](https://filesystem-spec.readthedocs.io/) `HTTPFileSystem` turns byte reads into HTTP range requests and can fetch many ranges concurrently ([`cat_ranges`](https://filesystem-spec.readthedocs.io/en/latest/async.html)). `pread` is a small equivalent, kept dependency-free and tuned to EBI's ~8-connection throttle; moving the transport onto `fsspec` is a reasonable later change.
+- [`copick`](https://github.com/copick/copick) (CZI, [Protein Science 2026](https://onlinelibrary.wiley.com/doi/10.1002/pro.70578)) is the closest cryo-EM analog: an fsspec-backed, server-less dataset API with lazy reads. It assumes data stored as OME-Zarr (chunked, multiscale). EMPIAR entries are raw MRC/TIFF, so copick needs a per-entry zarr conversion first — the conversion that MRC's flat layout lets `scigantic_empiar` skip.
+
 ## Notes
 
 - MRC/MRCS (movies, micrographs, tomograms, particle stacks) and some TIFF. Files often nest a couple subdir levels down; `find_mrc` handles that.
