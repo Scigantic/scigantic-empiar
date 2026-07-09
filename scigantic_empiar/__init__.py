@@ -31,7 +31,7 @@ from .reader import entry_url, fast_path, list_files, pread
 from .render import preview
 from .workspace import add_to_fast_workspace
 
-__version__ = "0.2.0"
+__version__ = "0.1.0"
 
 __all__ = [
     # rendering

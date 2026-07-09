@@ -29,7 +29,7 @@ FAST_MNT = os.environ.get("SCIGANTIC_EMPIAR_FAST_MNT", "/mnt/empiar-fast")
 
 # Descriptive UA (contact) is the polite convention for automated EBI/NCBI
 # access and avoids some abuse filters.
-USER_AGENT = "scigantic-empiar/0.2 (+https://github.com/scigantic/scigantic-empiar; mailto:support@scigantic.com)"
+USER_AGENT = "scigantic-empiar/0.1 (+https://github.com/scigantic/scigantic-empiar; mailto:support@scigantic.com)"
 
 session = requests.Session()
 session.headers.update({"User-Agent": USER_AGENT})
