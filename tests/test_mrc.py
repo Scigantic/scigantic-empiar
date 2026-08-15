@@ -1,3 +1,7 @@
+
+# Internals now live in the package root (byte-identical to the copy that
+# ships in the Scigantic notebook image), so patch there: setting the name on
+# a compatibility shim does not change what the real functions resolve.
 """mrc.py — header parsing, file discovery, and NumPy readers."""
 import numpy as np
 
@@ -27,12 +31,12 @@ def test_find_mrc_recurses_subdirs(monkeypatch):
         "data": ["notes.txt", "micrographs/"],           # no MRC at top level
         "data/micrographs": ["log.txt", "stack_0001.mrc"],  # found one level down
     }
-    monkeypatch.setattr(mrc, "list_files", lambda eid, subdir="data": listings[subdir])
+    monkeypatch.setattr(se, "list_files", lambda eid, subdir="data": listings[subdir])
     assert se.find_mrc(10406) == "data/micrographs/stack_0001.mrc"
 
 
 def test_find_mrc_returns_none_when_absent(monkeypatch):
-    monkeypatch.setattr(mrc, "list_files", lambda eid, subdir="data": ["readme.txt"])
+    monkeypatch.setattr(se, "list_files", lambda eid, subdir="data": ["readme.txt"])
     assert se.find_mrc(1) is None
 
 
@@ -44,8 +48,8 @@ def test_read_mrc_frame_shapes_and_values(monkeypatch):
             return header                                   # header read
         return np.arange(length // 4, dtype=np.float32).tobytes()  # frame read
 
-    monkeypatch.setattr(mrc, "pread", fake_pread)
-    monkeypatch.setattr(mrc, "fast_path", lambda eid: None)
+    monkeypatch.setattr(se, "pread", fake_pread)
+    monkeypatch.setattr(se, "fast_path", lambda eid: None)
 
     arr, h = se.read_mrc_frame(10002, filename="m.mrc", frame=0)
     assert arr.shape == (3, 4)                               # (ny, nx)
@@ -54,11 +58,15 @@ def test_read_mrc_frame_shapes_and_values(monkeypatch):
     assert h["file"] == "m.mrc"
 
 
-def test_power_spectrum_and_downsample():
+def test_power_spectrum():
     g = np.outer(np.sin(np.linspace(0, 12, 128)), np.sin(np.linspace(0, 9, 128)))
     ps = se.power_spectrum(g.astype(np.float32))
     assert ps.shape == (128, 128)
     assert ps.min() >= 0.0 and ps.max() <= 1.0              # normalised to [0,1]
 
-    ds = mrc.downsample(g, target=64)
-    assert ds.shape == (64, 64)                             # stride-2 decimation
+
+# `downsample` (stride decimation, a[::f, ::f]) is deliberately gone. Decimation
+# throws away every pixel between strides, which on a noisy micrograph aliases
+# rather than averages and was one of the reasons the first EMPIAR thumbnail set
+# came out unusable. Preview scaling now goes through the shipping `thumbnail` /
+# `_stretch` path instead.

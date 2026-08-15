@@ -1,3 +1,7 @@
+
+# Internals now live in the package root (byte-identical to the copy that
+# ships in the Scigantic notebook image), so patch there: setting the name on
+# a compatibility shim does not change what the real functions resolve.
 """reader.py — URL/path helpers and the parallel range reader."""
 import numpy as np
 import pytest
@@ -17,7 +21,7 @@ def test_entry_url_normalises_ids():
 
 
 def test_fast_path(tmp_path, monkeypatch):
-    monkeypatch.setattr(reader, "FAST_MNT", str(tmp_path))
+    monkeypatch.setattr(se, "FAST_MNT", str(tmp_path))
     (tmp_path / "10002").mkdir()
     assert reader.fast_path("10002") == str(tmp_path / "10002")
     assert reader.fast_path("99999") is None
@@ -37,7 +41,7 @@ def test_pread_splits_into_parallel_ranges(monkeypatch):
         calls.append((start, end))
         return BUFFER[start:end + 1]
 
-    monkeypatch.setattr(reader, "_get_range", fake_get_range)
+    monkeypatch.setattr(se, "_get_range", fake_get_range)
 
     offset, length = 500, 2_500_000        # > 2 MB -> must fan out
     got = se.pread("http://ebi.example/x.mrc", offset, length, nthreads=8)

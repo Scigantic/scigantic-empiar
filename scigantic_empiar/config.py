@@ -1,35 +1,14 @@
-"""Locations + the shared HTTP session for scigantic_empiar.
+"""Compatibility shim.
 
-Everything is overridable via env vars so a Scigantic notebook (mounted at
-``$SCIGANTIC_MOUNT_PATH``, with its own catalog/fast buckets) and a standalone
-install behave sensibly without config.
+Everything now lives in the package root, which is byte-identical to the copy
+that ships inside the Scigantic notebook image. Keeping one file is the whole
+point: this package and that image previously drifted into two forks of the
+same library, differing in 23 functions, and the published half quietly shipped
+readers that had already been fixed on the other side.
+
+These modules re-export the public names so `from scigantic_empiar.mrc import
+read_mrc` and friends keep working.
 """
-from __future__ import annotations
-import os
-import requests
+from . import API, CATALOG_URL, EBI, FAST_BUCKET, FAST_MNT, MOUNT, _session as session
 
-# The whole EMPIAR tree is FUSE-mounted here inside a Scigantic notebook. When
-# absent (standalone use), the readers stream straight from EBI over HTTPS.
-MOUNT = os.environ.get("SCIGANTIC_MOUNT_PATH", "/mnt/http-archive/data")
-
-# EBI's public data endpoints.
-EBI = "https://ftp.ebi.ac.uk/empiar/world_availability"
-API = "https://www.ebi.ac.uk/empiar/api/entry"
-
-# Prebuilt per-entry metadata + thumbnail index (id, title, size, method,
-# thumbnail_url) that powers EmpiarCatalog search/gallery.
-CATALOG_URL = os.environ.get(
-    "SCIGANTIC_EMPIAR_CATALOG",
-    "https://scigantic-empiar-catalog.s3.amazonaws.com/catalog.json",
-)
-
-# S3 fast-workspace: full-speed mirrored copies of chosen entries.
-FAST_BUCKET = os.environ.get("SCIGANTIC_EMPIAR_FAST_BUCKET", "scigantic-empiar-fast")
-FAST_MNT = os.environ.get("SCIGANTIC_EMPIAR_FAST_MNT", "/mnt/empiar-fast")
-
-# Descriptive UA (contact) is the polite convention for automated EBI/NCBI
-# access and avoids some abuse filters.
-USER_AGENT = "scigantic-empiar/0.1 (+https://github.com/scigantic/scigantic-empiar; mailto:support@scigantic.com)"
-
-session = requests.Session()
-session.headers.update({"User-Agent": USER_AGENT})
+__all__ = ["API", "CATALOG_URL", "EBI", "FAST_BUCKET", "FAST_MNT", "MOUNT", "session"]

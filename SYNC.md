@@ -1,6 +1,6 @@
 # Keeping `_search.py` in sync
 
-`scigantic_empiar/_search.py` is the query layer: synonym vocabulary, whole-word
+`scigantic_empiar/__init__.py` and `scigantic_empiar/_search.py` are the library: synonym vocabulary, whole-word
 plural-tolerant matching, literal-over-synonym ranking, and the structured
 filters. It is **vendored verbatim** from the Scigantic monorepo copy that ships
 inside the notebook image, and the two must stay byte-identical.

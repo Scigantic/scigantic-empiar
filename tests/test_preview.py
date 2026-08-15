@@ -1,3 +1,7 @@
+
+# Internals now live in the package root (byte-identical to the copy that
+# ships in the Scigantic notebook image), so patch there: setting the name on
+# a compatibility shim does not change what the real functions resolve.
 """render.py — rendering, and the promise that preview() never raises."""
 import matplotlib
 
@@ -11,7 +15,7 @@ from scigantic_empiar import render
 def test_preview_renders_two_panels(monkeypatch):
     img = np.random.default_rng(0).standard_normal((256, 256)).astype(np.float32)
     header = {"nx": 256, "ny": 256, "apix": 1.05, "file": "m.mrc"}
-    monkeypatch.setattr(render, "read_mrc_frame", lambda *a, **k: (img, header))
+    monkeypatch.setattr(se, "read_mrc_frame", lambda *a, **k: (img, header))
 
     fig = se.preview(10002, filename="m.mrc")
     assert fig is not None
@@ -22,7 +26,7 @@ def test_preview_never_raises_on_read_error(monkeypatch, capsys):
     def boom(*a, **k):
         raise OSError("404 from EBI")
 
-    monkeypatch.setattr(render, "read_mrc_frame", boom)
+    monkeypatch.setattr(se, "read_mrc_frame", boom)
     # metadata lookup also unavailable -> still must not raise
     monkeypatch.setattr(
         "scigantic_empiar.catalog.EmpiarClient.summary",

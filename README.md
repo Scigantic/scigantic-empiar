@@ -78,9 +78,22 @@ cat.search("ribosome", half_maps=True, sort="resolution")
 "a receptor under 100 kDa": the assembled complex carries the G protein and any
 nanobodies, so it is almost always heavier than the molecule of interest.
 
-**Changed in 0.2.0.** Before this release `search(query=...)` matched against the
+**Changed in 0.2.0.** Before that release `search(query=...)` matched against the
 dataset **title only**. EMPIAR titles describe the experiment ("Cryo electron
 microscopy of ..."), and the scientific vocabulary people actually search by
 lives in the EMDB cross-reference, so `search("GPCR")` returned **nothing at all**
 across the whole archive. It now returns 81 entries. If you pinned 0.1.0 because
 search seemed to return too little, this is why.
+
+## Relationship to the Scigantic notebook image
+
+This package and the copy preinstalled in Scigantic's cryo-EM notebook image are
+the **same source**. They were not always: the two drifted into forks differing
+in 23 functions, and the published half kept shipping readers that had already
+been fixed on the other side, including an MRC-only `thumbnail` that used stride
+decimation and could not read TIFF micrographs at all.
+
+0.3.0 collapses that. `scigantic_empiar/__init__.py` and `_search.py` here are
+byte-identical to the shipping copy (see `SYNC.md`); the small per-topic modules
+remain as thin re-export shims so `from scigantic_empiar.mrc import read_mrc`
+keeps working.

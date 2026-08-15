@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scigantic-empiar"
-version = "0.2.0"
+version = "0.3.0"
 description = "Explore the EMPIAR cryo-EM archive from Python — stream any of ~3,000 datasets (8.9 PiB) over parallel HTTP range reads, nothing downloaded."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -14,6 +14,7 @@ keywords = ["cryo-em", "cryo-et", "empiar", "mrc", "structural-biology", "micros
 dependencies = [
     "numpy",
     "requests",
+    "scigantic-headers>=0.1.3",
 ]
 
 [project.optional-dependencies]
