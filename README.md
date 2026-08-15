@@ -9,7 +9,8 @@ import scigantic_empiar as se
 
 se.preview(10406)                      # render the micrograph below, in seconds
 se.EmpiarClient().summary(10406)       # title, pixel size, method, DOI, EMDB/PDB cross-refs
-se.EmpiarCatalog().search("ribosome")  # search the whole archive by metadata (instant)
+se.EmpiarCatalog().search("ribosome")            # search the whole archive (instant)
+se.EmpiarCatalog().search("GPCR", max_res=3.0)   # by science, not just by title
 ```
 
 ![A motion-corrected 70S-ribosome micrograph (EMPIAR-10406) and its power spectrum, rendered by se.preview(10406)](https://raw.githubusercontent.com/scigantic/scigantic-empiar/main/docs/preview_10406.png)
@@ -34,7 +35,7 @@ Core (`numpy`, `requests`) is enough for the readers; `[viz]` adds `matplotlib` 
 | `find_mrc(id)` | resolve an entry's first MRC, recursing the (often nested) `data/` layout |
 | `pread(url, off, len)` | the 8-way parallel HTTP range reader under it all |
 | `EmpiarClient` | per-entry metadata from EMPIAR's REST API (cached) |
-| `EmpiarCatalog` | search + a visual thumbnail gallery across all entries (from a prebuilt index) |
+| `EmpiarCatalog` | search + a visual gallery across all entries (from a prebuilt index) |
 | `add_to_fast_workspace(id)` | mirror an entry to S3 for full-speed reprocessing (RELION/EMAN2) |
 
 ## Why parallel range reads
@@ -58,3 +59,28 @@ The job splits in two: parse MRC, and read bytes from a remote file. Both have e
 ## License
 
 MIT.
+
+## Search
+
+`EmpiarCatalog.search()` matches across the dataset title, the deposited sample
+name, protein and organism names, method and cross-referenced accessions, with a
+small cryo-EM synonym vocabulary, and filters on size, resolution, molecular
+weight, half-map/mask availability and EMDB cross-reference.
+
+```python
+cat = se.EmpiarCatalog()
+cat.search("GPCR", max_res=3.0, max_chain_kda=100)
+cat.search("cryoET", min_gb=100, sort="size")
+cat.search("ribosome", half_maps=True, sort="resolution")
+```
+
+`max_chain_kda` is the largest single polymer, which is the filter you want for
+"a receptor under 100 kDa": the assembled complex carries the G protein and any
+nanobodies, so it is almost always heavier than the molecule of interest.
+
+**Changed in 0.2.0.** Before this release `search(query=...)` matched against the
+dataset **title only**. EMPIAR titles describe the experiment ("Cryo electron
+microscopy of ..."), and the scientific vocabulary people actually search by
+lives in the EMDB cross-reference, so `search("GPCR")` returned **nothing at all**
+across the whole archive. It now returns 81 entries. If you pinned 0.1.0 because
+search seemed to return too little, this is why.

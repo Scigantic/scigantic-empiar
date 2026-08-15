@@ -16,6 +16,7 @@ the flat ``se.<name>`` calls above keep working:
 """
 from __future__ import annotations
 
+from ._search import expand_query, match_score
 from .catalog import EmpiarCatalog, EmpiarClient
 from .config import API, CATALOG_URL, EBI, FAST_BUCKET, FAST_MNT, MOUNT
 from .mrc import (
@@ -31,7 +32,7 @@ from .reader import entry_url, fast_path, list_files, pread
 from .render import preview
 from .workspace import add_to_fast_workspace
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     # rendering
@@ -43,6 +44,8 @@ __all__ = [
     "pread", "list_files", "entry_url", "fast_path",
     # metadata / catalog
     "EmpiarClient", "EmpiarCatalog",
+    # query layer
+    "expand_query", "match_score",
     # fast workspace
     "add_to_fast_workspace",
     # config constants
