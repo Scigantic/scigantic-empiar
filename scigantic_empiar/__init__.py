@@ -35,7 +35,7 @@ from scigantic_headers import decode_mrc_header
 
 from ._search import expand_query, match_score, passes_filters, field_text as _field_text
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 __all__ = [
     "MOUNT", "entry_url", "pread", "list_files", "read_mrc",
