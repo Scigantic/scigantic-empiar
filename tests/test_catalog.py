@@ -1,5 +1,7 @@
 """catalog.py — metadata client + searchable catalog (no network)."""
 import pandas as pd
+import pytest
+import requests
 
 import scigantic_empiar as se
 from scigantic_empiar.catalog import EmpiarClient
@@ -47,3 +49,36 @@ def test_client_summary_shape(monkeypatch):
     assert s["id"] == "10002"                              # prefix stripped
     assert s["format"] == "MRC"
     assert s["title"] == "80S ribosome"
+
+
+class _FakeResponse:
+    def __init__(self, payload):
+        self._payload = payload
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return self._payload
+
+
+def test_catalog_load_raises_instead_of_degrading(monkeypatch, tmp_path):
+    """load() used to swallow any failure and fall back to a bare directory
+    listing (id column only, every search field gone). It must now raise, the
+    same way EmdbCatalog.load() does, rather than quietly answering queries
+    against a catalog that lost its data."""
+    def _boom(*a, **kw):
+        raise requests.exceptions.RetryError("EBI unreachable after retries")
+    monkeypatch.setattr(se._meta_session, "get", _boom)
+    monkeypatch.setattr(se, "MOUNT", str(tmp_path))  # even if a mount exists
+    (tmp_path / "10002").mkdir()
+
+    with pytest.raises(requests.exceptions.RetryError):
+        se.EmpiarCatalog().load()
+
+
+def test_catalog_load_success_no_fallback_needed(monkeypatch):
+    rows = [{"id": "10002", "title": "80S ribosome"}]
+    monkeypatch.setattr(se._meta_session, "get", lambda *a, **kw: _FakeResponse(rows))
+    df = se.EmpiarCatalog().load()
+    assert list(df["id"]) == ["10002"]
