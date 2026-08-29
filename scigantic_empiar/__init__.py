@@ -31,11 +31,13 @@ from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from scigantic_headers import decode_mrc_header
 
 from ._search import expand_query, match_score, passes_filters, field_text as _field_text
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 
 __all__ = [
     "MOUNT", "entry_url", "pread", "list_files", "read_mrc",
@@ -62,6 +64,21 @@ FAST_MNT = os.environ.get("SCIGANTIC_EMPIAR_FAST_MNT", "/mnt/empiar-fast")
 _UA = {"User-Agent": "Scigantic-empiar/1.0 (+https://scigantic.com; mailto:support@scigantic.com)"}
 _session = requests.Session()
 _session.headers.update(_UA)
+
+# A second session, retry-enabled, for metadata reads (the EMPIAR REST API, the
+# catalog index, EBI's directory autoindex, HEAD size checks). These are quick
+# JSON/HTML requests where retrying a 5xx is free and worth it.
+#
+# _session above stays plain, with no retry adapter. _get_range already has its
+# own retry-and-abandon loop, tuned against EBI's measured behavior: the actual
+# failure mode there is a request that hangs rather than errors, so a short
+# timeout that abandons and retries is what helps, and it is already what
+# happens. Mounting urllib3 retries under that too would multiply the retry
+# count for range reads without addressing the thing that actually goes wrong.
+_meta_session = requests.Session()
+_meta_session.headers.update(_UA)
+_meta_session.mount("https://", HTTPAdapter(max_retries=Retry(
+    total=3, backoff_factor=0.5, status_forcelist=(500, 502, 503, 504))))
 
 
 def entry_url(entry_id, *parts) -> str:
@@ -144,7 +161,7 @@ def list_files(entry_id, subdir="data"):
     if os.path.isdir(local):
         return sorted(os.listdir(local))
     # parse the EBI autoindex
-    html = _session.get(entry_url(eid, subdir) + "/", timeout=30).text
+    html = _meta_session.get(entry_url(eid, subdir) + "/", timeout=30).text
     import re
     out = [m for m in re.findall(r'href="([^"?/][^"]*)"', html) if not m.startswith("..")]
     return sorted(set(out))
@@ -336,7 +353,7 @@ class RangeFile(io.RawIOBase):
 def _remote_size(url):
     if url.startswith("/") or url.startswith("file:"):
         return os.path.getsize(url.replace("file://", ""))
-    r = _session.head(url, allow_redirects=True, timeout=30)
+    r = _meta_session.head(url, allow_redirects=True, timeout=30)
     r.raise_for_status()
     return int(r.headers.get("Content-Length") or 0)
 
@@ -587,7 +604,7 @@ class EmpiarClient:
     @functools.lru_cache(maxsize=4096)
     def entry(self, entry_id):
         eid = str(entry_id).replace("EMPIAR-", "")
-        r = _session.get(f"{API}/{eid}/", timeout=30); r.raise_for_status()
+        r = _meta_session.get(f"{API}/{eid}/", timeout=30); r.raise_for_status()
         d = r.json()
         e = d.get(f"EMPIAR-{eid}") or (list(d.values())[0] if d else {})
         return e if isinstance(e, dict) else {}
@@ -612,7 +629,15 @@ class EmpiarCatalog:
 
     Loads a pre-built index (metadata per entry, plus a thumbnail where one has
     been rendered) so search/filter over all ~3,000 entries is instant, with no
-    live reads. Falls back to the live mount listing when no index is reachable.
+    live reads.
+
+    Raises loudly if the index cannot be read, retrying transient failures
+    first. It used to fall back silently to a bare directory listing (id
+    column only, every search field gone) on any exception, including a 5xx
+    that a retry would have ridden out. A catalog that quietly degrades to a
+    list of ids while still answering queries is how this index once
+    advertised coverage it did not have; EmdbCatalog.load() (scigantic-emdb)
+    was written not to repeat that, and this now matches it.
 
     The index carries the EMDB-derived scientific vocabulary (sample name,
     protein chains, organism, resolution, per-chain molecular weight, half-map
@@ -627,11 +652,9 @@ class EmpiarCatalog:
         import pandas as pd
         if self._df is not None:
             return self._df
-        try:
-            self._df = pd.DataFrame(_session.get(self.url, timeout=30).json())
-        except Exception:
-            ids = sorted(os.listdir(MOUNT)) if os.path.isdir(MOUNT) else []
-            self._df = pd.DataFrame({"id": ids})
+        r = _meta_session.get(self.url, timeout=30)
+        r.raise_for_status()
+        self._df = pd.DataFrame(r.json())
         return self._df
 
     def search(self, query=None, method=None, max_gb=None, limit=50, *,
