@@ -1,5 +1,10 @@
 # scigantic_empiar
 
+[![CI](https://github.com/Scigantic/scigantic-empiar/actions/workflows/ci.yml/badge.svg)](https://github.com/Scigantic/scigantic-empiar/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/scigantic-empiar)](https://pypi.org/project/scigantic-empiar/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/scigantic-empiar)](https://pypi.org/project/scigantic-empiar/)
+[![License](https://img.shields.io/github/license/Scigantic/scigantic-empiar)](https://github.com/Scigantic/scigantic-empiar/blob/main/LICENSE)
+
 Explore [EMPIAR](https://www.ebi.ac.uk/empiar/), EMBL-EBI's public archive of raw cryo-EM and cryo-ET image data (~3,000 datasets, ~8.9 PiB), from Python without downloading anything.
 
 EMPIAR is served over EBI's public HTTPS at roughly 1.5 MB/s per connection. `scigantic_empiar` parallelises HTTP range reads, which aggregates to around 5 to 10 MB/s, so you can pull a single frame from a many-GB entry in seconds, decode the MRC, and render the micrograph and its power spectrum. Nothing is copied to disk.
