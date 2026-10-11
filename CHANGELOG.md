@@ -3,6 +3,18 @@
 All notable changes to this project are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.4.2] - 2026-10-11
+
+### Fixed
+- `scigantic_empiar.__version__` reported 0.4.0 in the 0.4.1 release, so anything
+  that prints or checks the version saw the wrong one (the cryoem image build log
+  showed `scigantic_empiar 0.4.0` for an installed 0.4.1). It now matches
+  `pyproject.toml`.
+
+### Added
+- A test that fails if `__version__` and the version in `pyproject.toml` differ, so a
+  release cannot forget one of the two again.
+
 ## [0.4.1] - 2026-08-31
 
 ### Changed
