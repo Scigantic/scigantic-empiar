@@ -22,6 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Image Processing",
 ]
 dependencies = [
     "numpy>=1.24,<3",
@@ -39,6 +40,7 @@ Homepage = "https://scigantic.com"
 Repository = "https://github.com/Scigantic/scigantic-empiar"
 Issues = "https://github.com/Scigantic/scigantic-empiar/issues"
 "EMPIAR" = "https://www.ebi.ac.uk/empiar/"
+Documentation = "https://github.com/Scigantic/scigantic-empiar#readme"
 
 [tool.setuptools]
 packages = ["scigantic_empiar"]
