@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+title: scigantic-empiar
+abstract: "Explore the EMPIAR cryo-EM archive from Python and stream its datasets over parallel HTTP range reads without downloading them."
+authors:
+  - name: Scigantic
+    website: https://scigantic.com
+repository-code: https://github.com/Scigantic/scigantic-empiar
+url: https://pypi.org/project/scigantic-empiar/
+license: MIT
+keywords:
+  - "cryo-em"
+  - "cryo-et"
+  - "empiar"
+  - "mrc"
+  - "structural-biology"
+  - "microscopy"
+version: "0.5.0"
+date-released: '2026-11-22'
