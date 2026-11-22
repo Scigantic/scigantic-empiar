@@ -36,6 +36,7 @@ dev = ["pytest", "matplotlib", "pandas"]
 
 [project.urls]
 Homepage = "https://scigantic.com"
+"EMPIAR in a hosted notebook" = "https://scigantic.com/archive/e3d9a7c0-1f2b-4a6d-9c8e-2b7f4a1c6e05?utm_source=pypi&utm_medium=project-urls&utm_campaign=scigantic-empiar"
 Repository = "https://github.com/Scigantic/scigantic-empiar"
 Issues = "https://github.com/Scigantic/scigantic-empiar/issues"
 "EMPIAR" = "https://www.ebi.ac.uk/empiar/"
