@@ -1,11 +1,11 @@
-# scigantic_empiar
+# scigantic-empiar
 
 [![CI](https://github.com/Scigantic/scigantic-empiar/actions/workflows/ci.yml/badge.svg)](https://github.com/Scigantic/scigantic-empiar/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/scigantic-empiar)](https://pypi.org/project/scigantic-empiar/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/scigantic-empiar)](https://pypi.org/project/scigantic-empiar/)
 [![License](https://img.shields.io/github/license/Scigantic/scigantic-empiar)](https://github.com/Scigantic/scigantic-empiar/blob/main/LICENSE)
 
-Explore [EMPIAR](https://www.ebi.ac.uk/empiar/), EMBL-EBI's public archive of raw cryo-EM and cryo-ET image data (~3,000 datasets, ~8.9 PiB), from Python without downloading anything.
+Search and read [EMPIAR](https://www.ebi.ac.uk/empiar/), EMBL-EBI's public archive of raw cryo-EM and cryo-ET image data (~3,000 datasets, ~8.9 PiB), from Python without downloading a dataset. Find entries by protein, organism, method or resolution, then read one micrograph, movie frame or tomogram slice (MRC or TIFF) over HTTP range requests.
 
 EMPIAR is served over EBI's public HTTPS at roughly 1.5 MB/s per connection. `scigantic_empiar` parallelises HTTP range reads, which aggregates to around 5 to 10 MB/s, so you can pull a single frame from a many-GB entry in seconds, decode the MRC, and render the micrograph and its power spectrum. Nothing is copied to disk.
 
@@ -29,6 +29,10 @@ pip install "scigantic-empiar[viz]"
 ```
 
 Core (`numpy`, `requests`) is enough for the readers. `[viz]` adds `matplotlib`, `pandas` and `pillow` for `preview()` and the catalog gallery.
+
+## Try it on hosted data
+
+The Scigantic catalog entry for [EMPIAR](https://scigantic.com/archive/e3d9a7c0-1f2b-4a6d-9c8e-2b7f4a1c6e05?utm_source=github&utm_medium=readme&utm_campaign=scigantic-empiar) opens a Jupyter notebook in the browser with the whole public EMPIAR tree mounted read-only. Files are read in place from EBI, so there is no download step and nothing to set up. More open cryo-EM data, including [EMDB](https://scigantic.com/archive/b1f4c8e2-3d7a-5c91-84b6-2e9f7a3c5d18?utm_source=github&utm_medium=readme&utm_campaign=scigantic-empiar), is listed under [cryo-EM datasets](https://scigantic.com/topics/cryo-em?utm_source=github&utm_medium=readme&utm_campaign=scigantic-empiar).
 
 ## What it does
 
